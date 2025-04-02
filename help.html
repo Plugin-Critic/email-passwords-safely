@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help encrypting and decrypting passwords to email them safely</title>
+    <style>
+        html {
+            font-size: 1.2em;
+        }
+        body {
+            font-family: sans-serif;
+            background: #FAF3E0;
+            margin: 0 auto;
+            padding: 25px 20px;
+            max-width: 800px;
+            line-height: 1.4;
+        }
+        body,
+        header a {
+            color: #0c2756;
+        }
+        a {
+            color: #db6651;
+        }
+        h1, h2, label {
+            font-family: serif;
+            line-height: 1.2;
+        }
+        h2,
+        label {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .small {
+            font-size: 1rem;
+            font-weight: normal;
+            font-family: sans-serif;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .center {
+            text-align: center;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 3px double #000000;
+            padding-bottom: 1rem;
+        }
+        header h1 {
+            margin: 0;
+        }
+
+        header a {
+            text-decoration: none;
+            min-width: 48px;
+            min-height: 48px;
+            text-align: center;
+        }
+        header nav > * {
+            line-height: 48px;
+            font-size: 1.1rem;
+            display: inline-block;
+            margin: 0 .5rem;
+        }
+        header nav a:hover {
+            text-decoration: underline;
+        }
+        header nav .active {
+            font-weight: 700;
+            color: #db6651;
+        }
+        main > * {
+            margin: 1.8rem 0 0 0;
+        }
+        main > *:first-child {
+            margin: 0 0 0 0;
+        }
+
+        textarea {
+            width: 100%;
+            margin: .3rem 0;
+            display: block;
+            border-radius: .5rem .5rem 0;
+            padding: .5rem;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #ffffff;
+            border: 2px solid #0c2756;
+            cursor: pointer;
+            padding: .4rem 1.2rem .5rem;
+            font-weight: 700;
+            color: #0c2756;
+            border-radius: .5rem;
+            position: relative;
+        }
+        button:hover {
+            top: 1px;
+            left: 2px;
+            border-color: #c74029;
+            color: #c74029;
+        }
+
+        footer {
+            text-align: center;
+            border-top: 3px double #000000;
+            padding-top: 1rem;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>
+            <a href="/">Email Passwords Safely</a>
+        </h1>
+        <nav>
+            <a href="/">encrypt</a>
+            <a href="/decrypt.html">decrypt</a>
+            <span class="active">help</span>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2 id="generate-key">Generate Public/Private Keys</h2>
+            <p>Be sure to download the Public and Private Key files, nothing is saved so you will not be able to get them again.</p>
+            <p class="center"><button onclick="generateKeys(2048)">Generate RSA-2048 (small)</button> <button onclick="generateKeys(4096)">Generate RSA-4096 (large)</button></p>
+            <h3>RSA-2048</h3>
+            <ul>
+                <li>Smaller link to share with people</li>
+                <li>Message limit of ~190 characters</li>
+            </ul>
+            <h3>RSA-4096</h3>
+            <ul>
+                <li>More secure</li>
+                <li>Longer link to share with people</li>
+                <li>Message limit of ~446 characters</li>
+            </ul>
+            <div id="generatedKeysContainer" class="hidden">
+                <h3>Personalized link</h3>
+                <p><a id="encryptionLink" href="" style="overflow-wrap: break-word;"></a></p>
+                <h3>Public Key <a id="downloadPublicKeyLink" class="small" href="">Download Public Key file</a></h3>
+                <textarea readonly id="publicKeyPem" rows="5"></textarea>
+                <h3>Private Key <a id="downloadPrivateKeyLink" class="small" href="">Download Private Key file</a></h3>
+                <textarea readonly id="privateKeyPem" rows="5"></textarea>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>Support this project by <a href="//plugincritic.com/donate">buying me a coffee</a> or <a href="//plugincritic.com/hire-me/">hiring me</a> for web development.</p>
+    </footer>
+
+    <script>
+        async function generateRSAKeyPair( keySize ) {
+            if ( 4096 !== keySize ) {
+                keySize = 2048;
+            }
+            const keyPair = await window.crypto.subtle.generateKey(
+                {
+                    name: "RSA-OAEP",
+                    modulusLength: keySize,
+                    publicExponent: new Uint8Array([1, 0, 1]), // 65537
+                    hash: "SHA-256",
+                },
+                true, // Extractable keys
+                [ 'encrypt', 'decrypt' ]
+            );
+
+            const publicKey = await window.crypto.subtle.exportKey( 'spki', keyPair.publicKey );
+            const privateKey = await window.crypto.subtle.exportKey( 'pkcs8', keyPair.privateKey );
+
+            let response = {
+                publicKey: btoa( String.fromCharCode( ...new Uint8Array( publicKey ) ) ),
+                privateKey: btoa( String.fromCharCode( ...new Uint8Array( privateKey ) ) ),
+            };
+
+            function convertToPEM( key, type ) {
+                const keyBase64 = key
+                    .match( /.{1,64}/g ) // Split into 64-char lines
+                    .join( "\n" );
+
+                const header = `-----BEGIN ${type} KEY-----\n`;
+                const footer = `\n-----END ${type} KEY-----`;
+
+                return header + keyBase64 + footer;
+            }
+
+            response.publicKeyPem = convertToPEM( response.publicKey, 'PUBLIC' );
+            response.privateKeyPem = convertToPEM( response.privateKey, 'PRIVATE' );
+
+            return response;
+        }
+
+        async function generateKeys( keySize ) {
+            document.getElementById( 'generatedKeysContainer' ).classList.remove( 'hidden' );
+            let generatedKey = await generateRSAKeyPair( keySize );
+            document.getElementById( 'publicKeyPem' ).innerHTML = generatedKey.publicKeyPem;
+            document.getElementById( 'privateKeyPem' ).innerHTML = generatedKey.privateKeyPem;
+
+            const publicKeyLink = document.getElementById( 'downloadPublicKeyLink' );
+            publicKeyLink.download = 'email-passwords-safely-public-key.pem';
+            publicKeyLink.href = URL.createObjectURL( new Blob( [ generatedKey.publicKeyPem ], { type: 'application/x-pem-file' } ) );
+
+            const privateKeyLink = document.getElementById( 'downloadPrivateKeyLink' );
+            privateKeyLink.download = 'email-passwords-safely-private-key.pem';
+            privateKeyLink.href = URL.createObjectURL( new Blob( [ generatedKey.privateKeyPem ], { type: 'application/x-pem-file' } ) );
+
+            const linkUrl = new URL( '/', window.location.origin );
+            linkUrl.searchParams.set( 'k', generatedKey.publicKey );
+            const linkUrlString = linkUrl.toString();
+            const linkElement = document.getElementById( 'encryptionLink' );
+            linkElement.innerHTML = linkUrlString;
+            linkElement.href = linkUrlString;
+        }
+    </script>
+</body>
+</html>

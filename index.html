@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgo=">
+    <title>Email Passwords Safely</title>
+    <style>
+        html {
+            font-size: 1.2em;
+        }
+        body {
+            font-family: sans-serif;
+            background: #FAF3E0;
+            margin: 0 auto;
+            padding: 25px 20px;
+            max-width: 800px;
+            line-height: 1.4;
+        }
+        body,
+        header a {
+            color: #0c2756;
+        }
+        a {
+            color: #c74029;
+        }
+        h1, h2, label {
+            font-family: serif;
+            line-height: 1.2;
+        }
+        h2,
+        label {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .small {
+            font-size: 1rem;
+            font-weight: normal;
+            font-family: sans-serif;
+        }
+        section label span.small {
+            white-space: nowrap;
+        }
+        .hidden {
+            display: none !important;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 3px double #000000;
+            padding-bottom: 1rem;
+        }
+        header h1 {
+            margin: 0;
+        }
+
+        header a {
+            text-decoration: none;
+            min-width: 48px;
+            min-height: 48px;
+            text-align: center;
+        }
+        header nav > * {
+            line-height: 48px;
+            font-size: 1.1rem;
+            display: inline-block;
+            margin: 0 .5rem;
+        }
+        header nav a:hover {
+            text-decoration: underline;
+        }
+        header nav .active {
+            font-weight: 700;
+            color: #c74029;
+        }
+        main > * {
+            margin: 1.8rem 0 0 0;
+        }
+        main > *:first-child {
+            margin: 0 0 0 0;
+        }
+
+        textarea {
+            width: 100%;
+            margin: .3rem 0;
+            display: block;
+            border-radius: .5rem .5rem 0;
+            padding: .5rem;
+            box-sizing: border-box;
+        }
+        #messageSection p {
+            text-align: center;
+            margin: 0;
+        }
+        #messageSection p.error {
+            color: #ff0000;
+            font-weight: 700;
+        }
+
+        footer {
+            text-align: center;
+            border-top: 3px double #000000;
+            padding-top: 1rem;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>
+            <a href="/">Email Passwords Safely</a>
+        </h1>
+        <nav>
+            <span class="active">encrypt</span>
+            <a href="/decrypt.html">decrypt</a>
+            <a href="/help.html">help</a>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>Encrypt passwords before sending them</h2>
+            <p>Email is notoriously unsafe, this tool encrypts your sensitive data to safely send using email or messaging app.</p>
+            <p><a href="/help.html#generate-key">Create a Private Key</a> to use this tool for yourself.</p>
+        </section>
+
+        <section id="publicKeySection">
+            <p>Be sure you are using the correct <a href="/help#generate-key">public key</a> or your recipient will not be able to decrypt your message.</p>
+            <label>Paste the Public Key: <span class="small">(PEM format)</span>
+                <textarea id="publicKeyText" rows="9" placeholder="-----BEGIN PUBLIC KEY-----&#10;&#10;-----END PUBLIC KEY-----"></textarea>
+            </label>
+            <label class="small" style="text-align: center;">Select public key file instead of pasting it:
+                <input type="file" id="publicKeyFile" accept=".pem">
+            </label>
+        </section>
+
+        <section id="messageSection">
+            <label>Message to encrypt:
+                <textarea id="message" rows="10" placeholder="Enter the message to encrypt..."></textarea>
+            </label>
+            <p><span id="messageCharactersPlaceholder">0</span> characters | <span id="messageBytesPlaceholder">0</span> bytes</p>
+        </section>
+
+        <section>
+            <label>Encrypted message:
+                <textarea id="encryptedOutput" rows="10" readonly placeholder="Encrypted message will appear here..."></textarea>
+            </label>
+        </section>
+    </main>
+    <footer>
+        <p>Support this project by <a href="//plugincritic.com/donate">buying me a coffee</a> or <a href="//plugincritic.com/hire-me/">hiring me</a> for web development.</p>
+    </footer>
+    <script>
+
+        // The public key can be set here if sharing a static html version of this page to run locally
+        (function () {
+            let publicKey = ``;
+            if ( publicKey ) {
+                document.getElementById( 'publicKeyText' ).value = publicKey;
+                document.getElementById( 'publicKeySection' ).classList.add( 'hidden' );
+            }
+        })();
+
+
+        // Get publicKey from the url
+        (function () {
+            let publicKey = ( new URLSearchParams( window.location.search ) ).get( 'k' )?.replace( /\s+/g, '+' )?.trim();
+            if ( publicKey ) {
+                document.getElementById( 'publicKeyText' ).value = publicKey;
+                document.getElementById( 'publicKeySection' ).classList.add( 'hidden' );
+            }
+        })();
+
+        // Set publicKey from file selector
+        document.getElementById( 'publicKeyFile' ).addEventListener( 'change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function( e ) {
+                    document.getElementById( 'publicKeyText' ).value = e.target.result.trim();
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function setMessageLengthNotice() {
+            let message = document.getElementById( 'message' )?.value?.trim() || '';
+            let messageBytes = new TextEncoder().encode( message ).length || 0;
+            let messageCharacters = message.length || 0;
+            document.getElementById( 'messageBytesPlaceholder' ).innerHTML = messageBytes;
+            document.getElementById( 'messageCharactersPlaceholder' ).innerHTML = messageCharacters;
+        }
+
+        let timeout;
+        function debounce() {
+            setMessageLengthNotice();
+            if ( timeout ) {
+                clearTimeout(timeout);
+            }
+            timeout = setTimeout( handleEncryption, 500 );
+        }
+
+        messageTextarea = document.getElementById( 'message' );
+        messageTextarea.addEventListener( 'paste' , handleEncryption);
+        messageTextarea.addEventListener( 'change' , handleEncryption);
+        messageTextarea.addEventListener( 'input' , debounce);
+
+        // function copyText() {
+        //     const textarea = document.getElementById( 'encryptedOutput' );
+        //     navigator.clipboard.writeText( textarea.value )
+        //         .then( () => console.log( 'Text copied!' ) )
+        //         .catch( err => console.error( 'Failed to copy text', err ) );
+        // }
+        // document.getElementById( 'encryptedOutput' ).addEventListener( 'click', copyText );
+
+        let currentMessage;
+
+        async function handleEncryption() {
+            setMessageLengthNotice();
+
+            const message = document.getElementById( 'message' ).value.trim();
+            if ( message === currentMessage ) {
+                return;
+            }
+            currentMessage = message;
+            if ( !message ) {
+                document.getElementById( 'encryptedOutput' ).value = '';
+                return;
+            }
+
+
+            const publicKeyPem = document.getElementById( 'publicKeyText' ).value.trim();
+
+            if ( !publicKeyPem ) {
+                document.getElementById( 'encryptedOutput' ).value = 'Unable to encrypt message without an encryption key, see "help" page for instructions.';
+                return;
+            }
+
+            let publicKey, encryptedString;
+            try {
+                publicKey = await importPublicKey( publicKeyPem );
+                encryptedString = await encryptData( publicKey, message );
+                document.getElementById( 'encryptedOutput' ).value = encryptedString;
+            } catch ( error ) {
+                console.error( 'Encryption error:', error );
+
+                // 4096 < 446
+                // 2048 < 189
+                let maxLength = 189;
+                let keySize = publicKey?.algorithm?.modulusLength;
+                if ( 4096 === keySize ) {
+                    maxLength = 446;
+                }
+
+                let errorMessage = `Encryption failed:\n * Please check your public key format`;
+
+                if ( new TextEncoder().encode( message ).length > Math.floor( maxLength * .95 ) ) {
+                    errorMessage += `\n * The message may be too long, the likely limit is ${maxLength} characters/bytes`;
+                }
+
+                document.getElementById( 'encryptedOutput' ).value = errorMessage;
+            }
+        }
+
+        async function importPublicKey( pem ) {
+            const binaryDer = decodeBase64Pem( pem );
+            return crypto.subtle.importKey(
+                'spki',
+                binaryDer,
+                { name: 'RSA-OAEP', hash: 'SHA-256' },
+                true,
+                [ 'encrypt' ]
+            );
+        }
+
+        async function encryptData( publicKey, payload ) {
+            const encoder = new TextEncoder();
+            const encodedData = encoder.encode( payload );
+
+            const encrypted = await crypto.subtle.encrypt(
+                { name: 'RSA-OAEP' },
+                publicKey,
+                encodedData
+            );
+
+            return btoa(String.fromCharCode( ...new Uint8Array( encrypted ) ) );
+        }
+
+        function decodeBase64Pem(pem) {
+            const base64String = pem.replace( /-----BEGIN PUBLIC KEY-----|-----END PUBLIC KEY-----|\n/g, '' );
+            const binaryString = atob( base64String );
+            return new Uint8Array( [ ...binaryString].map( char => char.charCodeAt( 0 ) ) ).buffer;
+        }
+    </script>
+</body>
+</html>
