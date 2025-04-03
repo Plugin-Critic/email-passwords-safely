@@ -24,7 +24,7 @@
         a {
             color: #c74029;
         }
-        h1, h2, label {
+        h1, h2, h3, label {
             font-family: serif;
             line-height: 1.2;
         }
@@ -32,6 +32,10 @@
         label {
             display: block;
             font-size: 1.5rem;
+            font-weight: 700;
+        }
+        h3 {
+            font-size: 1.2rem;
             font-weight: 700;
         }
         .small {
@@ -122,11 +126,10 @@
         <section>
             <h2>Encrypt passwords before sending them</h2>
             <p>Email is notoriously unsafe, this tool encrypts your sensitive data to safely send using email or messaging app.</p>
-            <p><a href="/help.html#generate-key">Create a Private Key</a> to use this tool for yourself.</p>
+            <p>Create encryption keys on the <a href="/help.html#generate-key">help page</a> to use this tool for yourself.</p>
         </section>
 
         <section id="publicKeySection">
-            <p>Be sure you are using the correct <a href="/help#generate-key">public key</a> or your recipient will not be able to decrypt your message.</p>
             <label>Paste the Public Key: <span class="small">(PEM format)</span>
                 <textarea id="publicKeyText" rows="9" placeholder="-----BEGIN PUBLIC KEY-----&#10;&#10;-----END PUBLIC KEY-----"></textarea>
             </label>
@@ -150,6 +153,7 @@
     </main>
     <footer>
         <p>Support this project by <a href="//plugincritic.com/donate">buying me a coffee</a> or <a href="//plugincritic.com/hire-me/">hiring me</a> for web development.</p>
+        <p>Review the <a href="/help.html#security-features">security features</a> and the <a href="https://github.com/Plugin-Critic/email-passwords-safely">GitHub source code</a></p>
     </footer>
     <script>
 

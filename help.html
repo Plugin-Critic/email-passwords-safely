@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgo=">
     <title>Help encrypting and decrypting passwords to email them safely</title>
     <style>
         html {
@@ -23,15 +24,16 @@
         a {
             color: #db6651;
         }
-        h1, h2, label {
+        h1, h2, h3 {
             font-family: serif;
             line-height: 1.2;
-        }
-        h2,
-        label {
-            display: block;
-            font-size: 1.5rem;
             font-weight: 700;
+        }
+        h2 {
+            font-size: 1.5rem;
+        }
+        h3 {
+            font-size: 1.2rem;
         }
         .small {
             font-size: 1rem;
@@ -75,9 +77,11 @@
         }
         main > * {
             margin: 1.8rem 0 0 0;
+            border-top: 3px double #000000;
         }
         main > *:first-child {
             margin: 0 0 0 0;
+            border-top: none;
         }
 
         textarea {
@@ -130,18 +134,26 @@
         <section>
             <h2 id="generate-key">Generate Public/Private Keys</h2>
             <p>Be sure to download the Public and Private Key files, nothing is saved so you will not be able to get them again.</p>
-            <p class="center"><button onclick="generateKeys(2048)">Generate RSA-2048 (small)</button> <button onclick="generateKeys(4096)">Generate RSA-4096 (large)</button></p>
-            <h3>RSA-2048</h3>
-            <ul>
-                <li>Smaller link to share with people</li>
-                <li>Message limit of ~190 characters</li>
-            </ul>
-            <h3>RSA-4096</h3>
-            <ul>
-                <li>More secure</li>
-                <li>Longer link to share with people</li>
-                <li>Message limit of ~446 characters</li>
-            </ul>
+            <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 0 40px;">
+                <div>
+                    <h3>RSA-2048</h3>
+                    <ul>
+                        <li>Smaller link to share with people</li>
+                        <li>Message limit of ~190 characters</li>
+                    </ul>
+                    <p class="center"><button onclick="generateKeys(2048)">Generate RSA-2048</button></p>
+                </div>
+                <div>
+                    <h3>RSA-4096</h3>
+                    <ul>
+                        <li>More secure</li>
+                        <li>Longer link to share with people</li>
+                        <li>Message limit of ~446 characters</li>
+                    </ul>
+                    <p class="center"><button onclick="generateKeys(4096)">Generate RSA-4096</button></p>
+                </div>
+            </div>
+
             <div id="generatedKeysContainer" class="hidden">
                 <h3>Personalized link</h3>
                 <p><a id="encryptionLink" href="" style="overflow-wrap: break-word;"></a></p>
@@ -151,9 +163,69 @@
                 <textarea readonly id="privateKeyPem" rows="5"></textarea>
             </div>
         </section>
+
+        <section id="security-features">
+            <h2>Safety Features</h2>
+            <ul>
+                <li>Runs entirely in your browser, no data is communicated off this page</li>
+                <li>No cookies, analytics or trackers are used on this site</li>
+                <li>No external files, scripts, css or images are loaded into any page</li>
+                <li>Each page is completely self contained</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Create shareable link using an existing PEM public key</h2>
+
+            <label>Paste the Public Key: <span class="small">(PEM format)</span>
+                <textarea id="publicKeyText" rows="5" placeholder="-----BEGIN PUBLIC KEY-----&#10;&#10;-----END PUBLIC KEY-----"></textarea>
+            </label>
+            <label class="small" style="text-align: center;">Select public key file instead of pasting it:
+                <input type="file" id="publicKeyFile" accept=".pem">
+            </label>
+            <p><a id="existingKeyLink" href="" style="overflow-wrap: break-word;"></a></p>
+            <script>
+                function displayExistingKeyLink( key ) {
+                    key = key.replace( /-----BEGIN PUBLIC KEY-----|-----END PUBLIC KEY-----|\n/g, '' ).trim();
+                    let linkUrlString;
+                    if ( key ) {
+                        const linkUrl = new URL('/', window.location.origin);
+                        linkUrl.searchParams.set('k', key);
+                        linkUrlString = linkUrl.toString();
+                    } else {
+                        linkUrlString = '';
+                    }
+                    const linkElement = document.getElementById('existingKeyLink');
+                    linkElement.innerHTML = linkUrlString;
+                    linkElement.href = linkUrlString;
+                }
+                const publicKeyTextarea = document.getElementById( 'publicKeyText' );
+                publicKeyTextarea.addEventListener( 'paste' , function ( e ) {
+                    const key = (e.clipboardData || window.clipboardData).getData('text');
+                    displayExistingKeyLink( key );
+                } );
+                publicKeyTextarea.addEventListener( 'change' , function ( e ) {
+                    const key = e.target.value;
+                    displayExistingKeyLink( key );
+                }  );
+                document.getElementById( 'publicKeyFile' ).addEventListener( 'change', function(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function( e ) {
+                            const message = e.target.result.trim();
+                            displayExistingKeyLink( message );
+                        };
+                        reader.readAsText(file);
+                    }
+                });
+
+            </script>
+        </section>
     </main>
     <footer>
         <p>Support this project by <a href="//plugincritic.com/donate">buying me a coffee</a> or <a href="//plugincritic.com/hire-me/">hiring me</a> for web development.</p>
+        <p>Review the <a href="/help.html#security-features">security features</a> and the <a href="https://github.com/Plugin-Critic/email-passwords-safely">GitHub source code</a></p>
     </footer>
 
     <script>
