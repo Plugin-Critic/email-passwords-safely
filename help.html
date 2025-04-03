@@ -92,6 +92,25 @@
             padding: .5rem;
             box-sizing: border-box;
         }
+        #generate-key .flex {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 30px 40px;
+        }
+        #generate-key .flex > a {
+            display: block;
+            border: 1px solid #0c2756;
+            color: #0c2756;
+            padding: .2rem .8rem .8rem;
+            text-decoration: none;
+        }
+        #generate-key .flex > a:hover {
+            border-color: #db6651;
+        }
+        #generate-key .flex > a ul {
+            padding-left: 1rem;
+        }
 
         button {
             background: #ffffff;
@@ -131,36 +150,39 @@
     </header>
 
     <main>
-        <section>
-            <h2 id="generate-key">Generate Public/Private Keys</h2>
-            <p>Be sure to download the Public and Private Key files, nothing is saved so you will not be able to get them again.</p>
-            <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 0 40px;">
-                <div>
-                    <h3>RSA-2048</h3>
+        <section id="generate-key">
+            <h2>Generate Public/Private Keys</h2>
+            <h3>Step 1: Click on a key size</h3>
+            <div class="flex">
+                <a href="#" onclick="generateKeys(2048)">
+                    <h3 class="center">RSA-2048</h3>
                     <ul>
+                        <li>Perfect for most users</li>
                         <li>Smaller link to share with people</li>
                         <li>Message limit of ~190 characters</li>
                     </ul>
-                    <p class="center"><button onclick="generateKeys(2048)">Generate RSA-2048</button></p>
-                </div>
-                <div>
-                    <h3>RSA-4096</h3>
+                </a>
+                <a href="#" onclick="generateKeys(4096)">
+                    <h3 class="center">RSA-4096</h3>
                     <ul>
                         <li>More secure</li>
                         <li>Longer link to share with people</li>
                         <li>Message limit of ~446 characters</li>
                     </ul>
-                    <p class="center"><button onclick="generateKeys(4096)">Generate RSA-4096</button></p>
-                </div>
+                </a>
             </div>
 
             <div id="generatedKeysContainer" class="hidden">
-                <h3>Personalized link</h3>
+                <h3>Step 2: Bookmark your personalized link</h3>
+                <p>Share this link so anyone can send you encrypted passwords, it is safe to share this link publicly.</p>
                 <p><a id="encryptionLink" href="" style="overflow-wrap: break-word;"></a></p>
-                <h3>Public Key <a id="downloadPublicKeyLink" class="small" href="">Download Public Key file</a></h3>
+                <h3>Step 3: Click link to download your <a id="downloadPublicKeyLink" class="small" href="" title="Click to download public key file">Public Key file</a></h3>
+                <p>Save this file where you can find it again, it is safe to share the Public Keyfile. This file is used on the <a href="encrypt.html">encrypt</a> page</p>
                 <textarea readonly id="publicKeyPem" rows="5"></textarea>
-                <h3>Private Key <a id="downloadPrivateKeyLink" class="small" href="">Download Private Key file</a></h3>
+                <h3>Step 4: Click link to download your <a id="downloadPrivateKeyLink" class="small" href="" title="Click to download private key file">Private Key file</a></h3>
+                <p>Save this file where you can find it again, <strong>DO NOT</strong> share the Private Key file. This file is used on the <a href="decrypt.html">decrypt</a> page</p>
                 <textarea readonly id="privateKeyPem" rows="5"></textarea>
+                <h3>Step 5: Relax <span class="small">Your passwords won't get snatched from your emails.</span></h3>
             </div>
         </section>
 
