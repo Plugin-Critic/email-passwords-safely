@@ -144,17 +144,58 @@
         </h1>
         <nav>
             <a href="/">encrypt</a>
-            <a href="/decrypt.html">decrypt</a>
+            <a href="/decrypt">decrypt</a>
             <span class="active">help</span>
         </nav>
     </header>
 
     <main>
+        <section>
+            <h2>How this works</h2>
+            <p>Asymetric cryptography is used to encrypt the password.</p>
+            <ul>
+                <li>A Public Key (safe to share) is used to encrypt the password</li>
+                <li>A Private Key (DO NOT share) is used to make it readable again</li>
+            </ul>
+            <p>Only a person with the Private Key is able to decrypt the password and read its contents.</p>
+        </section>
+
+        <section id="how-to-receive">
+            <h2>How to receive a password</h2>
+            <p>You are the recipient and the other person is the sender.</p>
+            <h3>Give the sender your public key</h3>
+            <ol>
+                <li>Create your Public/Private Key below if you don't already have one</li>
+                <li>Share your personalized link to the sender</li>
+                <li>Wait for them to send you the encrypted password</li>
+            </ol>
+            <h3>Make the password readable</h3>
+            <ol>
+                <li>Go to the <a href="decrypt">decrypt page</a></li>
+                <li>Add your Private Key to its textbox</li>
+                <li>Paste the encrypted message into its textbox</li>
+                <li>Click the "Decrypt Message" button</li>
+            </ol>
+        </section>
+
+        <section id="how-to-send">
+            <h2>How to send a password</h2>
+            <p>You are the sender and the other person is the recipient.</p>
+            <ol>
+                <li>Make sure your recipient has the Private Key</li>
+                <li>Use the recipients personalized link or go to the <a href="/">encrypt page</a></li>
+                <li>Enter the Public Key if you need to</li>
+                <li>Type your password</li>
+                <li>Copy the encrypted</li>
+                <li>Paste the encrypted message into an email or messaging app</li>
+            </ol>
+        </section>
+
         <section id="generate-key">
             <h2>Generate Public/Private Keys</h2>
             <h3>Step 1: Click on a key size</h3>
             <div class="flex">
-                <a href="#" onclick="generateKeys(2048)">
+                <a href="#generate-key" onclick="generateKeys(2048)">
                     <h3 class="center">RSA-2048</h3>
                     <ul>
                         <li>Perfect for most users</li>
@@ -162,7 +203,7 @@
                         <li>Message limit of ~190 characters</li>
                     </ul>
                 </a>
-                <a href="#" onclick="generateKeys(4096)">
+                <a href="#generate-key" onclick="generateKeys(4096)">
                     <h3 class="center">RSA-4096</h3>
                     <ul>
                         <li>More secure</li>
@@ -177,12 +218,13 @@
                 <p>Share this link so anyone can send you encrypted passwords, it is safe to share this link publicly.</p>
                 <p><a id="encryptionLink" href="" style="overflow-wrap: break-word;"></a></p>
                 <h3>Step 3: Click link to download your <a id="downloadPublicKeyLink" class="small" href="" title="Click to download public key file">Public Key file</a></h3>
-                <p>Save this file where you can find it again, it is safe to share the Public Keyfile. This file is used on the <a href="encrypt.html">encrypt</a> page.</p>
+                <p>Save this file where you can find it again, it is safe to share the Public Keyfile. This file is used on the <a href="encrypt">encrypt</a> page.</p>
                 <textarea readonly id="publicKeyPem" rows="5"></textarea>
                 <h3>Step 4: Click link to download your <a id="downloadPrivateKeyLink" class="small" href="" title="Click to download private key file">Private Key file</a></h3>
-                <p>Save this file where you can find it again, <strong>DO NOT</strong> share the Private Key file. This file is used on the <a href="decrypt.html">decrypt</a> page.</p>
+                <p>Save this file where you can find it again, <strong>DO NOT</strong> share the Private Key file. This file is used on the <a href="decrypt">decrypt</a> page.</p>
                 <textarea readonly id="privateKeyPem" rows="5"></textarea>
-                <h3>Step 5: Relax, <span class="small">Your passwords won't get snatched from your emails.</span></h3>
+                <h3>Step 5: Share your personalized link and keys</h3>
+                <p>As long as your Private Key is safe you do not need to create a new key.</p>
             </div>
         </section>
 
@@ -247,7 +289,7 @@
     </main>
     <footer>
         <p>Support this project by <a href="//plugincritic.com/donate">buying me a coffee</a> or <a href="//plugincritic.com/hire-me/">hiring me</a> for web development.</p>
-        <p>Review the <a href="/help.html#security-features">security features</a> and the <a href="https://github.com/Plugin-Critic/email-passwords-safely">GitHub source code</a></p>
+        <p>Review the <a href="/help#security-features">security features</a> and the <a href="https://github.com/Plugin-Critic/email-passwords-safely">GitHub source code</a></p>
     </footer>
 
     <script>

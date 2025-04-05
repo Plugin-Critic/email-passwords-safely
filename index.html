@@ -93,13 +93,18 @@
             padding: .5rem;
             box-sizing: border-box;
         }
-        #messageSection p {
+        section label + p {
             text-align: center;
             margin: 0;
         }
         #messageSection p.error {
             color: #ff0000;
             font-weight: 700;
+        }
+        #copyLink {
+            color: #c74029;
+            cursor: pointer;
+            text-decoration: underline;
         }
 
         footer {
@@ -117,20 +122,19 @@
         </h1>
         <nav>
             <span class="active">encrypt</span>
-            <a href="/decrypt.html">decrypt</a>
-            <a href="/help.html">help</a>
+            <a href="/decrypt">decrypt</a>
+            <a href="/help">help</a>
         </nav>
     </header>
 
     <main>
         <section>
-            <h2>Encrypt passwords before sending them</h2>
-            <p>Email is notoriously unsafe, this tool encrypts your sensitive data to safely send using email or messaging app.</p>
-            <p>Create encryption keys on the <a href="/help.html#generate-key">help page</a> to use this tool for yourself.</p>
+            <h2>Encrypt your passwords before emailing them</h2>
+            <p>Email is notoriously unsafe, make your passwords unreadable when sharing them.</p>
         </section>
 
         <section id="publicKeySection">
-            <label>Paste the Public Key: <span class="small">(PEM format)</span>
+            <label>Paste the Public Key: <a href="/help#generate-key" class="small" title="Create keys to use this tool">create keys</a>
                 <textarea id="publicKeyText" rows="9" placeholder="-----BEGIN PUBLIC KEY-----&#10;&#10;-----END PUBLIC KEY-----"></textarea>
             </label>
             <label class="small" style="text-align: center;">Select public key file instead of pasting it:
@@ -145,15 +149,24 @@
             <p><span id="messageCharactersPlaceholder">0</span> characters | <span id="messageBytesPlaceholder">0</span> bytes</p>
         </section>
 
-        <section>
-            <label>Encrypted message:
+        <section id="encryptedSection">
+            <label>Encrypted message: <span class="small" id="copyLink">[copy]</span>
                 <textarea id="encryptedOutput" rows="10" readonly placeholder="Encrypted message will appear here..."></textarea>
             </label>
+            <p>Copy the encrypted message and paste it into your email or any messaging app.</p>
+        </section>
+
+        <section id="bestPracticesSection">
+            <h2>Best Practices</h2>
+            <ul>
+                <li>Send 2 emails. The encrypted password in one, and the website with username in another.</li>
+                <li>Put as little context in the email with the password as possible, attackers will use anything in the message to figure out how useful the password is.</li>
+            </ul>
         </section>
     </main>
     <footer>
         <p>Support this project by <a href="//plugincritic.com/donate">buying me a coffee</a> or <a href="//plugincritic.com/hire-me/">hiring me</a> for web development.</p>
-        <p>Review the <a href="/help.html#security-features">security features</a> and the <a href="https://github.com/Plugin-Critic/email-passwords-safely">GitHub source code</a></p>
+        <p>Review the <a href="/help#security-features">security features</a> and the <a href="https://github.com/Plugin-Critic/email-passwords-safely">GitHub source code</a></p>
     </footer>
     <script>
 
@@ -210,13 +223,18 @@
         messageTextarea.addEventListener( 'change' , handleEncryption);
         messageTextarea.addEventListener( 'input' , debounce);
 
-        // function copyText() {
-        //     const textarea = document.getElementById( 'encryptedOutput' );
-        //     navigator.clipboard.writeText( textarea.value )
-        //         .then( () => console.log( 'Text copied!' ) )
-        //         .catch( err => console.error( 'Failed to copy text', err ) );
-        // }
-        // document.getElementById( 'encryptedOutput' ).addEventListener( 'click', copyText );
+        function copyText( event ) {
+            const textarea = document.getElementById( 'encryptedOutput' );
+            navigator.clipboard.writeText( textarea.value )
+                .then( () => {
+                    document.getElementById( 'copyLink' ).innerHTML = '[copied]';
+                    setTimeout( function () {
+                        document.getElementById( 'copyLink' ).innerHTML = '[copy]';
+                    }, 2500 );
+                } )
+                .catch( err => console.error( 'Failed to copy text', err ) );
+        }
+        document.getElementById( 'copyLink' ).addEventListener( 'click', copyText );
 
         let currentMessage;
 

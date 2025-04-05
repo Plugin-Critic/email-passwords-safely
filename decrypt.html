@@ -123,18 +123,18 @@
         <nav>
             <a href="/">encrypt</a>
             <span class="active">decrypt</span>
-            <a href="/help.html">help</a>
+            <a href="/help">help</a>
         </nav>
     </header>
 
     <main>
         <section>
-            <h2>Decrypt RSA encrypted messages that were emailed to you</h2>
-            <p>After you receive an <a href="/">encrypted message</a>, decrypt the message here using your <a href="/help.html#generate-key">Private Key</a>.</p>
+            <h2>Read the encrypted message you received</h2>
+            <p>After you receive an encrypted message use your Private Key to decrypt it and make it readable again.</p>
         </section>
 
         <section>
-            <label>Paste the Private Key: <span class="small">(PEM format)</span>
+            <label>Paste the Private Key: <a href="/help#generate-key" class="small" title="Create keys to use this tool">create keys</a>
                 <textarea id="privateKeyText" rows="5" placeholder="-----BEGIN PRIVATE KEY-----&#10;&#10;-----END PRIVATE KEY-----"></textarea>
             </label>
             <label class="small" style="text-align: center;">Select private key file instead of pasting it:
@@ -144,7 +144,7 @@
         </section>
 
         <section>
-            <label>Encrypted Message: <span class="small">(Base64)</span>
+            <label>Encrypted Message:
                 <textarea id="encryptedMessage" placeholder="Paste encrypted message here..." rows="10"></textarea>
             </label>
         </section>
@@ -161,7 +161,7 @@
     </main>
     <footer>
         <p>Support this project by <a href="//plugincritic.com/donate">buying me a coffee</a> or <a href="//plugincritic.com/hire-me/">hiring me</a> for web development.</p>
-        <p>Review the <a href="/help.html#security-features">security features</a> and the <a href="https://github.com/Plugin-Critic/email-passwords-safely">GitHub source code</a></p>
+        <p>Review the <a href="/help#security-features">security features</a> and the <a href="https://github.com/Plugin-Critic/email-passwords-safely">GitHub source code</a></p>
     </footer>
 
     <script>
