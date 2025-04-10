@@ -166,14 +166,14 @@
             <h3>Give the sender your public key</h3>
             <ol>
                 <li>Create your Public/Private Key below if you don't already have one</li>
-                <li>Share your personalized link to the sender</li>
-                <li>Wait for them to send you the encrypted password</li>
+                <li>Share your personalized link with the sender</li>
+                <li>Wait for them to send you their encrypted password</li>
             </ol>
             <h3>Make the password readable</h3>
             <ol>
                 <li>Go to the <a href="decrypt">decrypt page</a></li>
-                <li>Add your Private Key to its textbox</li>
-                <li>Paste the encrypted message into its textbox</li>
+                <li>Add or select your Private Key</li>
+                <li>Paste the contents of the encrypted message</li>
                 <li>Click the "Decrypt Message" button</li>
             </ol>
         </section>
@@ -183,16 +183,17 @@
             <p>You are the sender and the other person is the recipient.</p>
             <ol>
                 <li>Make sure your recipient has the Private Key</li>
-                <li>Use the recipients personalized link or go to the <a href="/">encrypt page</a></li>
-                <li>Enter the Public Key if you need to</li>
+                <li>Use the recipient's personalized link or go to the <a href="/">encrypt page</a></li>
+                <li>Add or select the Public Key (if needed)</li>
                 <li>Type your password</li>
-                <li>Copy the encrypted</li>
+                <li>Copy the encrypted text</li>
                 <li>Paste the encrypted message into an email or messaging app</li>
             </ol>
         </section>
 
         <section id="generate-key">
             <h2>Generate Public/Private Keys</h2>
+            <p>So you want to use this website...</p>
             <h3>Step 1: Click on a key size</h3>
             <div class="flex">
                 <a href="#generate-key" onclick="generateKeys(2048)">
@@ -214,17 +215,15 @@
             </div>
 
             <div id="generatedKeysContainer" class="hidden">
-                <h3>Step 2: Bookmark your personalized link</h3>
-                <p>Share this link so anyone can send you encrypted passwords, it is safe to share this link publicly.</p>
-                <p><a id="encryptionLink" href="" style="overflow-wrap: break-word;"></a></p>
-                <h3>Step 3: Click link to download your <a id="downloadPublicKeyLink" class="small" href="" title="Click to download public key file">Public Key file</a></h3>
-                <p>Save this file where you can find it again, it is safe to share the Public Keyfile. This file is used on the <a href="encrypt">encrypt</a> page.</p>
+                <h3>Step 2: Save your Public and Private Keys</h3>
+                <p>Save these files in a safe place.</p>
+                <p style="margin-bottom: 0;"><a id="downloadPublicKeyLink" href="" title="Click to download public key file">Download Public Key file</a> or copy from below.</p>
                 <textarea readonly id="publicKeyPem" rows="5"></textarea>
-                <h3>Step 4: Click link to download your <a id="downloadPrivateKeyLink" class="small" href="" title="Click to download private key file">Private Key file</a></h3>
-                <p>Save this file where you can find it again, <strong>DO NOT</strong> share the Private Key file. This file is used on the <a href="decrypt">decrypt</a> page.</p>
+                <p style="margin-bottom: 0;"><a id="downloadPrivateKeyLink" href="" title="Click to download private key file">Download Private Key file</a> or copy from below.</p>
                 <textarea readonly id="privateKeyPem" rows="5"></textarea>
-                <h3>Step 5: Share your personalized link</h3>
-                <p>Use the link any time you need to receive a password from someone. As long as your Private Key is safe you do not need to create a new key.</p>
+                <h3>Step 3: Share your encryption link, <span class="small">and bookmark it too!</span></h3>
+                <p><a id="encryptionLink" href="" style="overflow-wrap: break-word;"></a></p>
+                <p>This link works with your Private Key, so keep your Private Key safe!</p>
             </div>
         </section>
 
@@ -240,6 +239,7 @@
 
         <section>
             <h2>Create shareable link using an existing PEM public key</h2>
+            <p>If you lost your encryption link you can recreate it here using your Public Key.</p>
 
             <label>Paste the Public Key: <span class="small">(PEM format)</span>
                 <textarea id="publicKeyText" rows="5" placeholder="-----BEGIN PUBLIC KEY-----&#10;&#10;-----END PUBLIC KEY-----"></textarea>
